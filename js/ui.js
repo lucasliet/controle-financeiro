@@ -127,15 +127,20 @@ export function updateCategoryTotalsDisplay() {
     if (reservaTotalDisplay) reservaTotalDisplay.textContent = `Reserva (Total Adic.): R$${reservaTotalGeneral.toFixed(2)}`;
 
     // Atualiza cor dos totais adicionados (Caixa e Reserva)
-    // Verde se >= 0, vermelho se < 0 (embora negativo seja incomum para total adicionado)
     if (caixaTotalDisplay) {
-        caixaTotalDisplay.style.color = caixaTotalGeneral < 0 ? '#c62828' : '#2e7d32';
+        caixaTotalDisplay.style.color = caixaTotalGeneral === 0 ? '#333' : (caixaTotalGeneral < 0 ? '#c62828' : '#2e7d32');
     }
     if (reservaTotalDisplay) {
-        reservaTotalDisplay.style.color = reservaTotalGeneral < 0 ? '#c62828' : '#2e7d32';
+        reservaTotalDisplay.style.color = reservaTotalGeneral === 0 ? '#333' : (reservaTotalGeneral < 0 ? '#c62828' : '#2e7d32');
     }
 
-    // A cor de needsTotalDisplay e wantsTotalDisplay é definida via CSS em layout.css
+    // Atualiza cor dos totais de gastos (Necessidades e Desejos)
+    if (needsDisplay) {
+        needsDisplay.style.color = needsTotalMonth === 0 ? '#333' : '#c62828';
+    }
+    if (wantsDisplay) {
+        wantsDisplay.style.color = wantsTotalMonth === 0 ? '#333' : '#c62828';
+    }
 }
 
 export function updateCaixaBalanceDisplay() {
@@ -143,7 +148,7 @@ export function updateCaixaBalanceDisplay() {
     const displayElement = document.getElementById('caixaBalanceDisplay');
     if (displayElement) {
         displayElement.textContent = `Saldo Caixa: R$${availableBalance.toFixed(2)}`;
-        displayElement.style.color = availableBalance < 0 ? '#c62828' : '#2e7d32';
+        displayElement.style.color = availableBalance === 0 ? '#333' : (availableBalance < 0 ? '#c62828' : '#2e7d32');
     }
 }
 
@@ -152,7 +157,7 @@ export function updateReservaBalanceDisplay() {
     const displayElement = document.getElementById('reservaBalanceDisplay');
     if (displayElement) {
         displayElement.textContent = `Saldo Reserva: R$${availableBalance.toFixed(2)}`;
-        displayElement.style.color = availableBalance < 0 ? '#c62828' : '#2e7d32';
+        displayElement.style.color = availableBalance === 0 ? '#333' : (availableBalance < 0 ? '#c62828' : '#2e7d32');
     }
 }
 

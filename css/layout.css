@@ -76,11 +76,11 @@
     font-size: 0.95rem;
 }
 
-/* Cor vermelha e peso normal para os totais de gastos do mês */
+/* Peso normal para os totais de gastos do mês (cor definida via JS) */
 #needsTotalDisplay,
 #wantsTotalDisplay {
     font-weight: 400; /* Peso normal */
-    color: #c62828;
+    /* color: #c62828; */ /* REMOVIDO - Cor definida via JS */
     font-size: 0.95rem;
 }
 

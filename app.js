@@ -129,8 +129,8 @@ function openModal() {
     // Reseta a seleção de débito para 'caixa' (needs)
     const caixaRadio = document.querySelector('input[name="debitSource"][value="caixa"]');
     if (caixaRadio) caixaRadio.checked = true;
-    // Reseta o checkbox de debitar do caixa (emergency)
-    if (debitCaixaCheckbox) debitCaixaCheckbox.checked = false;
+    // Reseta o checkbox de debitar do caixa (emergency) para MARCADO (true)
+    if (debitCaixaCheckbox) debitCaixaCheckbox.checked = true;
     modal.style.display = 'flex';
 }
 
