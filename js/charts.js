@@ -14,34 +14,32 @@ function createOrUpdateRuleChart() {
     const salary = getSalary();
     const limits = calculate50_30_20Rule(salary);
 
-    const today = new Date();
-    const currentMonthExpenses = getExpensesForMonth(today.getFullYear(), today.getMonth());
-    const needsMonth = calculateCategoryExpenses('needs', currentMonthExpenses);
-    const wantsMonth = calculateCategoryExpenses('wants', currentMonthExpenses);
-    const savingsGeneral = calculateCategoryExpenses('savings');
+    const needsGeneral = calculateCategoryExpenses('needs');
+    const wantsGeneral = calculateCategoryExpenses('wants');
+    const emergencyGeneral = calculateCategoryExpenses('emergency');
 
     const chartData = {
-        labels: ['Necessidades (50%)', 'Desejos (30%)', 'Poupança (20%)'],
+        labels: ['Necessidades (50%)', 'Desejos (30%)', 'Reserva (20%)'],
         datasets: [
             {
                 label: 'Limite (R$)',
-                data: [limits.needs, limits.wants, limits.savings],
+                data: [limits.needs, limits.wants, limits.emergency],
                 backgroundColor: 'rgba(150, 150, 150, 0.6)',
                 borderColor: 'rgba(150, 150, 150, 1)',
                 borderWidth: 1
             },
             {
-                label: 'Gasto (Mês / Total Pou.) (R$)',
-                data: [needsMonth, wantsMonth, savingsGeneral],
+                label: 'Gasto Atual (R$)',
+                data: [needsGeneral, wantsGeneral, emergencyGeneral],
                 backgroundColor: [
-                    needsMonth > limits.needs ? 'rgba(255, 99, 132, 0.6)' : 'rgba(75, 192, 192, 0.6)',
-                    wantsMonth > limits.wants ? 'rgba(255, 99, 132, 0.6)' : 'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)'
+                    needsGeneral > limits.needs ? 'rgba(255, 99, 132, 0.6)' : 'rgba(75, 192, 192, 0.6)',
+                    wantsGeneral > limits.wants ? 'rgba(255, 99, 132, 0.6)' : 'rgba(54, 162, 235, 0.6)',
+                    emergencyGeneral > limits.emergency ? 'rgba(255, 159, 64, 0.6)' : 'rgba(255, 206, 86, 0.6)'
                 ],
                 borderColor: [
-                    needsMonth > limits.needs ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)',
-                    wantsMonth > limits.wants ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)'
+                    needsGeneral > limits.needs ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)',
+                    wantsGeneral > limits.wants ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)',
+                    emergencyGeneral > limits.emergency ? 'rgba(255, 159, 64, 1)' : 'rgba(255, 206, 86, 1)'
                 ],
                 borderWidth: 1
             }
@@ -86,9 +84,9 @@ function createOrUpdateCategoryPieChart() {
     const currentMonthExpenses = getExpensesForMonth(today.getFullYear(), today.getMonth());
     const needsTotalMonth = calculateCategoryExpenses('needs', currentMonthExpenses);
     const wantsTotalMonth = calculateCategoryExpenses('wants', currentMonthExpenses);
-    const savingsTotalGeneral = calculateCategoryExpenses('savings');
+    const emergencyTotalGeneral = calculateCategoryExpenses('emergency');
 
-    const total = needsTotalMonth + wantsTotalMonth + savingsTotalGeneral;
+    const total = needsTotalMonth + wantsTotalMonth + emergencyTotalGeneral;
 
     if (total === 0) {
         if (categoryPieChartInstance) {
@@ -99,10 +97,10 @@ function createOrUpdateCategoryPieChart() {
     }
 
     const chartData = {
-        labels: ['Necessidades (Mês)', 'Desejos (Mês)', 'Poupança (Total)'],
+        labels: ['Necessidades (Mês)', 'Desejos (Mês)', 'Reserva (Total)'],
         datasets: [{
             label: 'Distribuição de Gastos',
-            data: [needsTotalMonth, wantsTotalMonth, savingsTotalGeneral],
+            data: [needsTotalMonth, wantsTotalMonth, emergencyTotalGeneral],
             backgroundColor: ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)'],
             borderColor: ['rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
             borderWidth: 1

@@ -39,6 +39,15 @@
     border-top: none;
 }
 
+/* Estilo para os <hr> dentro de .info-display */
+.info-display hr {
+    border: none; /* Remove a borda padrão */
+    height: 1px; /* Define a altura da linha */
+    background-color: #eee; /* Cor da linha, similar às bordas existentes */
+    margin: 5px 0; /* Adiciona um pequeno espaço vertical */
+    width: 100%; /* Garante que ocupe toda a largura */
+}
+
 /* Estilo remanescente de .info-item que pode ser removido ou ajustado se não for mais usado */
 .info-item label {
     margin-right: 8px;

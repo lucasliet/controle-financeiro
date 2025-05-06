@@ -1,7 +1,8 @@
 import { getExpenses, getSalary, deleteExpense as dataDeleteExpense } from './data.js';
 import {
     calculateCategoryExpenses,
-    calculateAvailableBalance,
+    calculateAvailableCaixaBalance,
+    calculateAvailableReservaBalance,
     checkExpensesAgainstRule,
     getExpensesForMonth
 } from './calculations.js';
@@ -72,7 +73,7 @@ export function updateStatementList(selectedMonthYear) {
         return;
     }
 
-    const categoryMap = { needs: 'Necessidades', wants: 'Desejos', savings: 'Poupança' };
+    const categoryMap = { needs: 'Necessidades', wants: 'Desejos', emergency: 'Reserva', caixa: 'Caixa' };
 
     monthExpenses.forEach(expense => {
         const listItem = document.createElement('li');
@@ -110,18 +111,29 @@ export function updateCategoryTotalsDisplay() {
 
     const needsTotalMonth = calculateCategoryExpenses('needs', currentMonthExpenses);
     const wantsTotalMonth = calculateCategoryExpenses('wants', currentMonthExpenses);
-    const savingsTotalGeneral = calculateCategoryExpenses('savings');
+    const caixaTotalGeneral = calculateCategoryExpenses('caixa');
+    const reservaTotalGeneral = calculateCategoryExpenses('emergency');
 
     document.getElementById('needsTotalDisplay').textContent = `Necessidades (Mês): R$${needsTotalMonth.toFixed(2)}`;
     document.getElementById('wantsTotalDisplay').textContent = `Desejos (Mês): R$${wantsTotalMonth.toFixed(2)}`;
-    document.getElementById('savingsTotalDisplay').textContent = `Poupança (Total): R$${savingsTotalGeneral.toFixed(2)}`;
+    document.getElementById('caixaTotalDisplay').textContent = `Caixa (Total Adic.): R$${caixaTotalGeneral.toFixed(2)}`;
+    document.getElementById('reservaTotalDisplay').textContent = `Reserva (Total Adic.): R$${reservaTotalGeneral.toFixed(2)}`;
 }
 
-export function updateSavingsBalanceDisplay() {
-    const availableBalance = calculateAvailableBalance();
-    const displayElement = document.getElementById('savingsBalanceDisplay');
+export function updateCaixaBalanceDisplay() {
+    const availableBalance = calculateAvailableCaixaBalance();
+    const displayElement = document.getElementById('caixaBalanceDisplay');
     if (displayElement) {
-        displayElement.textContent = `Saldo Disponível: R$${availableBalance.toFixed(2)}`;
+        displayElement.textContent = `Saldo Caixa: R$${availableBalance.toFixed(2)}`;
+        displayElement.style.color = availableBalance < 0 ? '#c62828' : '#555';
+    }
+}
+
+export function updateReservaBalanceDisplay() {
+    const availableBalance = calculateAvailableReservaBalance();
+    const displayElement = document.getElementById('reservaBalanceDisplay');
+    if (displayElement) {
+        displayElement.textContent = `Saldo Reserva: R$${availableBalance.toFixed(2)}`;
         displayElement.style.color = availableBalance < 0 ? '#c62828' : '#555';
     }
 }
@@ -130,32 +142,30 @@ export function updateDistributionStatus() {
     const statusElement = document.getElementById('distributionStatus');
     if (!statusElement) return;
 
-    const today = new Date();
-    const currentMonthExpenses = getExpensesForMonth(today.getFullYear(), today.getMonth());
+    const needsTotal = calculateCategoryExpenses('needs');
+    const wantsTotal = calculateCategoryExpenses('wants');
+    const emergencyTotal = calculateCategoryExpenses('emergency');
+    const totalConsidered = needsTotal + wantsTotal + emergencyTotal;
 
-    const needsTotalMonth = calculateCategoryExpenses('needs', currentMonthExpenses);
-    const wantsTotalMonth = calculateCategoryExpenses('wants', currentMonthExpenses);
-    const savingsTotalMonth = calculateCategoryExpenses('savings', currentMonthExpenses);
-    const totalExpensesMonth = needsTotalMonth + wantsTotalMonth + savingsTotalMonth;
+    let needsPerc = 0, wantsPerc = 0, emergencyPerc = 0;
 
-    let needsPerc = 0, wantsPerc = 0, savingsPerc = 0;
-
-    if (totalExpensesMonth > 0) {
-        needsPerc = (needsTotalMonth / totalExpensesMonth) * 100;
-        wantsPerc = (wantsTotalMonth / totalExpensesMonth) * 100;
-        savingsPerc = 100 - needsPerc - wantsPerc;
+    if (totalConsidered > 0) {
+        needsPerc = (needsTotal / totalConsidered) * 100;
+        wantsPerc = (wantsTotal / totalConsidered) * 100;
+        emergencyPerc = 100 - needsPerc - wantsPerc;
     } else {
-        statusElement.textContent = 'Distribuição (Mês): N/A';
+        statusElement.textContent = 'Distribuição (Nec/Des/Res): N/A';
         statusElement.className = 'distribution-status';
         return;
     }
 
     const ruleCheck = checkExpensesAgainstRule(getSalary());
     let statusClass = 'status-good';
-    if (!ruleCheck.needsOk && !ruleCheck.wantsOk) statusClass = 'status-bad';
-    else if (!ruleCheck.needsOk || !ruleCheck.wantsOk) statusClass = 'status-warning';
+    if (!ruleCheck.needsOk || !ruleCheck.wantsOk) {
+        statusClass = 'status-bad';
+    }
 
-    statusElement.textContent = `Distribuição (Mês): ${needsPerc.toFixed(1)}% Nec. / ${wantsPerc.toFixed(1)}% Des. / ${savingsPerc.toFixed(1)}% Pou.`;
+    statusElement.textContent = `Distribuição (Nec/Des/Res): ${needsPerc.toFixed(1)}% / ${wantsPerc.toFixed(1)}% / ${emergencyPerc.toFixed(1)}%`;
     statusElement.className = `distribution-status ${statusClass}`;
 }
 
@@ -171,11 +181,12 @@ export function updateTransactionsList() {
         return;
     }
 
-    const categoryMap = { needs: 'Necessidades', wants: 'Desejos', savings: 'Poupança' };
+    const categoryMap = { needs: 'Necessidades', wants: 'Desejos', emergency: 'Reserva', caixa: 'Caixa' };
 
     currentMonthExpenses.forEach(expense => {
         const listItem = document.createElement('li');
         listItem.setAttribute('data-id', expense.id);
+        listItem.setAttribute('data-category', expense.category);
         const categoryName = categoryMap[expense.category] || expense.category;
         const formattedDate = formatDate(expense.date);
 
@@ -210,9 +221,7 @@ export function updateTransactionsList() {
                     const idToDelete = parseInt(listItem.getAttribute('data-id'), 10);
                     const deleted = dataDeleteExpense(idToDelete);
                     if (deleted) {
-                        updateCategoryTotalsDisplay();
-                        updateSavingsBalanceDisplay();
-                        updateDistributionStatus();
+                        updateAllDisplays();
                         listItem.remove();
                         showNotification(`Transação "${deleted.description}" removida.`, 'info', 2000);
                     }
@@ -282,10 +291,18 @@ export function showNotification(message, type = 'info', duration = 3000) {
     }
 }
 
+export function toggleDebitSourceDisplay(category) {
+    const group = document.getElementById('debitSourceGroup');
+    if (group) {
+        group.style.display = (category === 'needs') ? 'block' : 'none';
+    }
+}
+
 export function updateAllDisplays() {
     updateSalaryDisplay();
     updateCategoryTotalsDisplay();
-    updateSavingsBalanceDisplay();
+    updateCaixaBalanceDisplay();
+    updateReservaBalanceDisplay();
     updateDistributionStatus();
     updateTransactionsList();
 }

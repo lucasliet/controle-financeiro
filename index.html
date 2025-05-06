@@ -52,13 +52,19 @@
                     <!-- Display de Informações (Totais e Status) -->
                     <div class="info-display">
                         <span id="salaryDisplay">Salário: R$0.00</span>
-                        <!-- Novo span para Saldo de Poupança -->
-                        <span id="savingsBalanceDisplay">Saldo Poupança: R$0.00</span>
-                        <span id="needsTotalDisplay">Necessidades: R$0.00</span>
-                        <span id="wantsTotalDisplay">Desejos: R$0.00</span>
-                        <span id="savingsTotalDisplay">Poupança (Total): R$0.00</span>
+                        <!-- Saldo Disponível Caixa -->
+                        <span id="caixaBalanceDisplay">Saldo Caixa: R$0.00</span>
+                        <!-- Saldo Disponível Reserva -->
+                        <span id="reservaBalanceDisplay">Saldo Reserva: R$0.00</span>
+                        <hr/>
+                        <span id="needsTotalDisplay">Necessidades (Mês): R$0.00</span>
+                        <span id="wantsTotalDisplay">Desejos (Mês): R$0.00</span>
+                        <hr/>
+                        <!-- Totais Adicionados -->
+                        <span id="caixaTotalDisplay">Caixa (Total Adic.): R$0.00</span>
+                        <span id="reservaTotalDisplay">Reserva (Total Adic.): R$0.00</span>
                         <div id="distributionStatus" class="distribution-status">
-                            Distribuição: N/A
+                            Distribuição (Nec/Des/Res): N/A
                         </div>
                     </div>
                 </div>
@@ -131,8 +137,21 @@
                         <option value="" disabled selected>Selecione...</option>
                         <option value="needs">Necessidades</option>
                         <option value="wants">Desejos</option>
-                        <option value="savings">Poupança</option>
+                        <option value="emergency">Reserva de Emergência</option> <!-- Nova Categoria -->
+                        <option value="caixa">Caixa</option> <!-- Renomeada -->
                     </select>
+                </div>
+                <!-- Novo grupo para escolher fonte do débito (Necessidades) -->
+                <div class="form-group" id="debitSourceGroup" style="display: none;">
+                    <label>Debitar de:</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="debitSource" value="caixa" checked> Caixa
+                        </label>
+                        <label>
+                            <input type="radio" name="debitSource" value="emergency"> Reserva de Emergência
+                        </label>
+                    </div>
                 </div>
                 <button type="submit">Adicionar Transação</button>
             </form>

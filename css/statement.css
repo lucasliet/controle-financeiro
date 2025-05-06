@@ -53,6 +53,8 @@
 #statementTransactions li[data-category="needs"] { border-left-color: #4caf50; } /* Verde */
 #statementTransactions li[data-category="wants"] { border-left-color: #2196f3; } /* Azul */
 #statementTransactions li[data-category="savings"] { border-left-color: #ffc107; } /* Amarelo */
+#statementTransactions li[data-category="emergency"] { border-left-color: #ff9800; } /* Laranja para Reserva */
+#statementTransactions li[data-category="caixa"] { border-left-color: #9e9e9e; } /* Cinza para Caixa */
 
 
 #statementTransactions .transaction-info {
@@ -95,4 +97,10 @@
 /* Opcional: Cor do valor para poupança */
 #statementTransactions li[data-category="savings"] .transaction-amount {
     color: #ff8f00; /* Laranja/Amarelo escuro */
+}
+
+/* Opcional: Cor do valor para Reserva e Caixa */
+#statementTransactions li[data-category="emergency"] .transaction-amount,
+#statementTransactions li[data-category="caixa"] .transaction-amount {
+    color: #616161; /* Cinza escuro */
 }
