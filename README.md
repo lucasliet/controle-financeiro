@@ -1,5 +1,5 @@
-# app_wand
-projeto poc flutter
+# Controle Financeiro
+projeto prova de conceito com gemini
 
 ## Descrição
 Este é um aplicativo de controle financeiro que ajuda você a rastrear suas despesas e categorizá-las de acordo com a regra 50/30/20. O aplicativo foi projetado para ser usado na web com uma interface semelhante à móvel (PWA) e possui um fundo roxo.
@@ -11,5 +11,5 @@ Este é um aplicativo de controle financeiro que ajuda você a rastrear suas des
 4. Assim que o Codespace estiver pronto, abra o terminal.
 5. Execute o seguinte comando para iniciar o aplicativo:
    ```
-   npm start
+   npx serve .
    ```
