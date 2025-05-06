@@ -1,13 +1,16 @@
 /* --- Menu Toggle (Hamburger) --- */
 .menu-toggle {
     position: fixed;
-    top: 15px;
-    left: 15px;
+    top: 0; /* Colado no topo */
+    left: 0; /* Colado na esquerda */
     z-index: 1100;
-    background: none;
+    background-color: #6a1b9a; /* Fundo roxo */
     border: none;
-    padding: 10px;
+    padding: 20px; /* Ajustar padding se necessário */
     cursor: pointer;
+    border-bottom-right-radius: 10px; /* Canto arredondado */
+    overflow: hidden; /* Garante que o ícone não saia do canto arredondado */
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.2); /* Adiciona sombra para destacar */
 }
 
 .hamburger,
@@ -15,7 +18,7 @@
 .hamburger::after {
     content: '';
     display: block;
-    background-color: #6a1b9a;
+    background-color: #fff; /* Ícone branco */
     height: 3px;
     width: 25px;
     border-radius: 3px;
@@ -37,12 +40,12 @@
 
 .menu-toggle.active .hamburger::before {
     transform: translateY(0) rotate(45deg);
-    background-color: #fff;
+    background-color: #fff; /* Mantém branco no 'X' */
 }
 
 .menu-toggle.active .hamburger::after {
     transform: translateY(-3px) rotate(-45deg);
-    background-color: #fff;
+    background-color: #fff; /* Mantém branco no 'X' */
 }
 
 /* --- Drawer --- */
