@@ -1,0 +1,106 @@
+/* --- Layout Principal e Seção de Informações --- */
+
+#info-section {
+    margin-bottom: 30px;
+}
+
+.salary-input-container {
+    margin-bottom: 20px;
+    display: block;
+}
+
+.salary-input-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+}
+
+.salary-input-container input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.info-display {
+    margin-top: 0;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #555;
+    border-top: none;
+}
+
+/* Estilo para os <hr> dentro de .info-display */
+.info-display hr {
+    border: none; /* Remove a borda padrão */
+    height: 1px; /* Define a altura da linha */
+    background-color: #eee; /* Cor da linha, similar às bordas existentes */
+    margin: 5px 0; /* Adiciona um pequeno espaço vertical */
+    width: 100%; /* Garante que ocupe toda a largura */
+}
+
+/* Estilo remanescente de .info-item que pode ser removido ou ajustado se não for mais usado */
+.info-item label {
+    margin-right: 8px;
+    font-weight: 400;
+    color: #555;
+}
+
+.info-item input[type="number"] {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    width: 120px; /* Considerar remover se não for mais relevante */
+}
+
+.info-display span {
+    display: block;
+}
+
+/* Cor padrão e peso normal para Salário, Caixa Adic., Reserva Adic. */
+#salaryDisplay,
+#caixaTotalDisplay,
+#reservaTotalDisplay {
+    font-weight: 400; /* Peso normal */
+    color: #333;
+    font-size: 0.95rem;
+}
+
+/* Peso normal para os totais de gastos do mês (cor definida via JS) */
+#needsTotalDisplay,
+#wantsTotalDisplay {
+    font-weight: 400; /* Peso normal */
+    /* color: #c62828; */ /* REMOVIDO - Cor definida via JS */
+    font-size: 0.95rem;
+}
+
+/* Novo: Estilo para os saldos (Caixa e Reserva) - Negrito */
+#caixaBalanceDisplay,
+#reservaBalanceDisplay {
+    font-weight: 600; /* Negrito */
+    font-size: 0.95rem; /* Mantém o tamanho da fonte */
+    /* A cor é definida dinamicamente via JS */
+}
+
+/* --- Estilos das Telas (Views) --- */
+.view {
+    padding-top: 60px; /* Espaço para o header/botão hamburger fixo */
+}
+
+.hidden-view {
+    display: none;
+}
+
+.active-view {
+    display: block;
+}

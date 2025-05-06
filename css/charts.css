@@ -1,0 +1,29 @@
+#charts-view .container h1 {
+    /* Herdado de base.css, sem necessidade de redefinir se for igual */
+}
+
+.chart-container {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    max-height: 50vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-container h2 {
+    text-align: center;
+    color: #4a4a4a;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 600;
+    border-bottom: none; /* Sobrescreve h2 base */
+    padding-bottom: 0; /* Sobrescreve h2 base */
+    flex-shrink: 0;
+}
+
+.chart-container canvas {
+    max-width: 100%;
+}

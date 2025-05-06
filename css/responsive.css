@@ -1,0 +1,88 @@
+@media (max-width: 600px) {
+    body {
+        font-size: 14px;
+    }
+
+    .container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    /* Layout */
+    #info-section {
+        /* A regra original não fazia nada aqui, pode ser removida se não houver intenção específica */
+        /* flex-direction: column; */ /* Já é o padrão de block */
+        /* align-items: flex-start; */ /* Já é o padrão de block */
+    }
+
+    .info-display {
+        /* margin-left: 0; */ /* Não tinha margem antes */
+        /* text-align: left; */ /* Já é o padrão */
+        margin-top: 10px; /* Mantém espaço acima */
+    }
+
+    .view {
+        padding-top: 70px; /* Aumenta espaço para header */
+    }
+
+    /* Componentes */
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .floating-btn {
+        width: 60px;
+        height: 60px;
+        line-height: 60px;
+        font-size: 30px;
+        bottom: 25px;
+        right: 25px;
+    }
+
+    #notification-container {
+        width: calc(100% - 40px);
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .notification {
+        font-size: 0.85rem;
+    }
+
+    /* Transações */
+    #transactions li {
+        font-size: 0.9rem;
+    }
+
+    .transaction-date {
+        font-size: 0.75rem;
+    }
+
+    .transaction-description {
+        font-size: 0.9rem;
+    }
+
+    .transaction-category {
+        font-size: 0.8rem;
+    }
+
+    .transaction-amount {
+        font-size: 0.9rem;
+    }
+
+    .delete-action {
+        width: 70px;
+    }
+
+    /* Gráficos */
+    .chart-container {
+        padding: 15px;
+        max-height: 45vh;
+    }
+}

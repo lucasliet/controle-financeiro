@@ -1,0 +1,737 @@
+body {
+    background-color: #f4f7f6; /* Cor de fundo mais suave */
+    margin: 0;
+    font-family: 'Poppins', sans-serif; /* Fonte moderna */
+    color: #333; /* Cor de texto padrão */
+    line-height: 1.6;
+    position: relative; /* Para posicionar o drawer */
+    overflow-x: hidden; /* Evita scroll horizontal causado pelo drawer */
+}
+
+.container {
+    max-width: 800px; /* Limita a largura máxima */
+    margin: 20px auto; /* Centraliza o container */
+    padding: 20px;
+    background-color: #fff; /* Fundo branco para o conteúdo */
+    border-radius: 8px; /* Cantos arredondados */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+h1 {
+    color: #6a1b9a; /* Roxo mais vibrante */
+    text-align: center;
+    padding: 0 0 20px 0; /* Ajuste no padding */
+    margin: 0 0 20px 0;
+    border-bottom: 1px solid #eee; /* Linha divisória */
+    font-weight: 600;
+}
+
+h2 {
+    color: #4a4a4a;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+h3 {
+    color: #4a4a4a;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Garante que a seção de info use layout de bloco padrão (vertical) */
+#info-section {
+    margin-bottom: 30px; /* Espaço antes da lista de transações */
+    /* Remover display: flex ou float se existirem */
+}
+
+/* Estilo para o container do input de salário */
+.salary-input-container {
+    margin-bottom: 20px; /* Espaço entre o input e o display de info */
+    /* Garante que ocupe a largura */
+    display: block;
+}
+
+.salary-input-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+}
+
+.salary-input-container input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Estilos para a seção de display de informações */
+.info-display {
+    margin-top: 0; /* Remover margem superior se houver */
+    padding: 15px; /* Adicionar padding interno */
+    border: 1px solid #eee; /* Adicionar uma borda sutil */
+    border-radius: 4px;
+    background-color: #f9f9f9; /* Fundo levemente diferente */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Aumentar um pouco o gap */
+    font-size: 0.95rem;
+    color: #555;
+    /* Remover border-top se não quiser a linha dupla */
+    border-top: none;
+}
+
+.info-item label {
+    margin-right: 8px;
+    font-weight: 400;
+    color: #555;
+}
+
+.info-item input[type="number"] {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    width: 120px; /* Largura fixa para o input de salário */
+}
+
+.info-display span {
+    display: block; /* Garante que cada span ocupe uma linha */
+}
+
+#salaryDisplay, #totalExpensesDisplay {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+/* Estilos para o status da distribuição */
+.distribution-status {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.9rem;
+    background-color: #e0e0e0; /* Cor padrão/neutra */
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.status-good {
+    background-color: #c8e6c9; /* Verde claro */
+    color: #2e7d32; /* Verde escuro */
+}
+
+.status-warning {
+    background-color: #fff9c4; /* Amarelo claro */
+    color: #fbc02d; /* Amarelo escuro */
+}
+
+.status-bad {
+    background-color: #ffcdd2; /* Vermelho claro */
+    color: #c62828; /* Vermelho escuro */
+}
+
+#transactions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Ajustes no LI para permitir swipe */
+#transactions li {
+    position: relative; /* Necessário para posicionar o fundo de exclusão */
+    background-color: #f9f9f9;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    /* border-left removido, será aplicado ao wrapper */
+    overflow: hidden; /* Esconde o fundo de exclusão que transborda */
+    user-select: none; /* Impede seleção de texto durante o swipe */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Wrapper para o conteúdo que será movido */
+.transaction-item-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px; /* Reduzir padding vertical ligeiramente */
+    background-color: #f9f9f9;
+    border-left: 4px solid #6a1b9a;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+    touch-action: pan-y;
+}
+
+/* Novo container para agrupar data, descrição e categoria */
+.transaction-info {
+    display: flex;
+    flex-direction: column; /* Empilha data sobre detalhes */
+    flex-grow: 1;
+    margin-right: 10px;
+    gap: 2px; /* Pequeno espaço entre data e detalhes */
+}
+
+/* Estilo para a data */
+.transaction-date {
+    font-size: 0.8rem; /* Data menor */
+    color: #888; /* Cor cinza para a data */
+    font-weight: 300;
+}
+
+/* Container para descrição e categoria */
+.transaction-details {
+    display: flex;
+    flex-direction: column; /* Mantém descrição sobre categoria */
+}
+
+.transaction-description {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem; /* Manter tamanho da descrição */
+}
+
+.transaction-category {
+    font-size: 0.85rem;
+    color: #777;
+}
+
+.transaction-amount {
+    font-weight: 600;
+    color: #6a1b9a;
+    white-space: nowrap;
+    font-size: 0.95rem; /* Ajustar se necessário */
+}
+
+/* Contêiner para a ação de exclusão (fundo vermelho e ícone) */
+.delete-action {
+    position: absolute;
+    top: 0;
+    right: 0; /* Começa na direita */
+    bottom: 0;
+    width: 80px; /* Largura da área de exclusão */
+    background-color: #e53935; /* Vermelho */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 0; /* Fica atrás do wrapper */
+    opacity: 0; /* Começa invisível */
+    transition: opacity 0.3s ease; /* Transição suave da opacidade */
+    pointer-events: none; /* Não interfere com o swipe */
+}
+
+/* Estilo para o ícone de lixeira (SVG) */
+.delete-action svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+/* Classe adicionada durante o swipe ativo */
+#transactions li.swiping .transaction-item-wrapper {
+    transition: none; /* Remove transição durante o arraste */
+}
+
+#transactions li.swiping .delete-action {
+    opacity: 1; /* Mostra o fundo vermelho durante o swipe */
+    pointer-events: auto; /* Permite clicar se necessário (não usado aqui) */
+}
+
+/* Animação de saída ao excluir */
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        height: 0;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        border: 0;
+    }
+}
+
+#transactions li.deleting {
+    animation: fadeOut 0.4s ease-out forwards;
+}
+
+/* Estilos para o Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1060; /* Acima do drawer */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5); /* Fundo escurecido mais forte */
+    display: flex; /* Centraliza o conteúdo verticalmente */
+    align-items: center; /* Centraliza o conteúdo verticalmente */
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto; /* Remove margem antiga, centralizado pelo flex */
+    padding: 30px; /* Mais padding interno */
+    border: none; /* Remove borda padrão */
+    width: 90%; /* Responsivo */
+    max-width: 450px; /* Largura máxima */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    position: relative; /* Para posicionar o botão de fechar */
+    animation: fadeIn 0.3s ease-out; /* Animação de entrada */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.close {
+    color: #aaa;
+    position: absolute; /* Posiciona relativo ao modal-content */
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1; /* Ajusta alinhamento vertical */
+}
+
+.close:hover,
+.close:focus {
+    color: #333; /* Cor mais escura no hover */
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Estilos para o Formulário no Modal */
+#transactionForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaço entre os grupos de formulário */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 400;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+#transactionForm input[type="number"],
+#transactionForm input[type="text"],
+#transactionForm input[type="date"], /* Aplica estilo ao input de data */
+#transactionForm select {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    width: 100%; /* Ocupa toda a largura */
+    box-sizing: border-box; /* Inclui padding na largura total */
+    background-color: white; /* Garante fundo branco para input date */
+}
+
+#transactionForm select {
+    appearance: none; /* Remove estilo padrão do select */
+    background-color: #fff;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: .65em auto;
+    padding-right: 30px; /* Espaço para a seta */
+}
+
+#transactionForm button[type="submit"] {
+    padding: 12px 20px;
+    background-color: #6a1b9a; /* Roxo */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px; /* Espaço acima do botão */
+}
+
+#transactionForm button[type="submit"]:hover {
+    background-color: #4a148c; /* Roxo mais escuro */
+}
+
+/* Botão Flutuante */
+.floating-btn {
+    position: fixed;
+    width: 55px; /* Levemente menor */
+    height: 55px;
+    bottom: 30px;
+    right: 30px;
+    background-color: #6a1b9a; /* Roxo */
+    color: #FFF;
+    border-radius: 50%; /* Círculo perfeito */
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra mais pronunciada */
+    font-size: 28px; /* Tamanho do ícone '+' */
+    line-height: 55px; /* Centraliza o '+' verticalmente */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Transições suaves */
+    z-index: 999; /* Abaixo do overlay */
+}
+
+.floating-btn:hover {
+    background-color: #4a148c; /* Roxo mais escuro */
+    transform: scale(1.05); /* Leve aumento no hover */
+}
+
+/* --- Estilos do Menu Drawer --- */
+.menu-toggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1100; /* Acima do overlay e drawer */
+    background: none;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.hamburger,
+.hamburger::before,
+.hamburger::after {
+    content: '';
+    display: block;
+    background-color: #6a1b9a; /* Cor do hamburger */
+    height: 3px;
+    width: 25px;
+    border-radius: 3px;
+    transition: all 0.3s ease-in-out;
+}
+
+.hamburger::before {
+    transform: translateY(-8px);
+}
+
+.hamburger::after {
+    transform: translateY(5px); /* Ajuste para alinhar com o before */
+}
+
+/* Animação do Hamburger para 'X' */
+.menu-toggle.active .hamburger {
+    background-color: transparent; /* Linha do meio some */
+}
+
+.menu-toggle.active .hamburger::before {
+    transform: translateY(0) rotate(45deg);
+    background-color: #fff; /* Cor do X dentro do drawer */
+}
+
+.menu-toggle.active .hamburger::after {
+    transform: translateY(-3px) rotate(-45deg); /* Ajuste para alinhar com o before */
+    background-color: #fff; /* Cor do X dentro do drawer */
+}
+
+.drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #6a1b9a; /* Cor de fundo do drawer */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    transform: translateX(-100%); /* Começa fora da tela */
+    transition: transform 0.3s ease-in-out;
+    z-index: 1050; /* Abaixo do botão de toggle ativo, acima do overlay */
+    padding-top: 60px; /* Espaço para o botão de toggle */
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.drawer li a {
+    display: block;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.2s ease;
+}
+
+.drawer li a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    z-index: 1000; /* Abaixo do drawer */
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- Estilos das Telas (Views) --- */
+.view {
+    /* display: none; */ /* Controlado por classes active/hidden */
+    padding-top: 60px; /* Espaço para o header/botão hamburger fixo */
+}
+
+.hidden-view {
+    display: none;
+}
+
+.active-view {
+    display: block;
+}
+
+/* --- Estilos da Tela de Gráficos --- */
+#charts-view .container h1 {
+    /* Estilo do H1 pode ser o mesmo */
+    color: #6a1b9a;
+    text-align: center;
+    padding: 0 0 20px 0;
+    margin: 0 0 20px 0;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+}
+
+.chart-container {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    /* Limita a altura máxima a 50% da altura da viewport */
+    max-height: 50vh;
+    /* Opcional: Definir uma altura e deixar o Chart.js se ajustar */
+    /* height: 45vh; */
+    /* Garante que o canvas não ultrapasse o container */
+    display: flex; /* Ajuda a controlar o tamanho do canvas filho */
+    flex-direction: column; /* Empilha título e canvas */
+}
+
+.chart-container h2 {
+    text-align: center;
+    color: #4a4a4a;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 600;
+    border-bottom: none; /* Remove borda do h2 geral */
+    padding-bottom: 0;
+    flex-shrink: 0; /* Impede que o título encolha */
+}
+
+/* Garante que o canvas use o espaço disponível respeitando a altura */
+.chart-container canvas {
+    max-width: 100%;
+    /* max-height: 100%; */ /* O Chart.js geralmente lida bem com isso */
+}
+
+/* --- Estilos das Notificações --- */
+#notification-container {
+    position: fixed;
+    top: 20px; /* Posicionar na parte superior */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column; /* Novas notificações aparecem abaixo */
+    gap: 10px;
+    width: 90%;
+    max-width: 400px;
+    pointer-events: none;
+}
+
+.notification {
+    background-color: #fff;
+    color: #333;
+    padding: 12px 15px;
+    border-radius: 6px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(-20px); /* Começa ligeiramente acima */
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    font-size: 0.9rem;
+    pointer-events: auto; /* Permite interação com a notificação */
+    border-left: 5px solid #ccc; /* Borda padrão */
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification-message {
+    flex-grow: 1;
+    margin-right: 10px;
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 1.4rem; /* Tamanho do 'x' */
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+.notification-close:hover {
+    color: #333;
+}
+
+/* Type variations */
+.notification-error {
+    background-color: #ffcdd2;
+    color: #c62828;
+    border-left-color: #c62828;
+}
+.notification-error .notification-close { color: #c62828; }
+.notification-error .notification-close:hover { color: #b71c1c; }
+
+.notification-warning {
+    background-color: #fff9c4;
+    color: #af8d00; /* Cor de texto mais escura para amarelo */
+    border-left-color: #fbc02d;
+}
+.notification-warning .notification-close { color: #af8d00; }
+.notification-warning .notification-close:hover { color: #f9a825; }
+
+.notification-success {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+    border-left-color: #2e7d32;
+}
+.notification-success .notification-close { color: #2e7d32; }
+.notification-success .notification-close:hover { color: #1b5e20; }
+
+.notification-info {
+    background-color: #e3f2fd;
+    color: #1e88e5;
+    border-left-color: #1e88e5;
+}
+.notification-info .notification-close { color: #1e88e5; }
+.notification-info .notification-close:hover { color: #1565c0; }
+
+/* Media Queries para Responsividade */
+@media (max-width: 600px) {
+    body {
+        font-size: 14px;
+    }
+
+    .container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.8rem; /* Ajuste tamanho do título */
+    }
+
+    #info-section {
+        flex-direction: column; /* Empilha itens verticalmente */
+        align-items: flex-start; /* Alinha itens à esquerda */
+    }
+
+    .info-display {
+        margin-left: 0; /* Remove margem */
+        text-align: left; /* Alinha texto à esquerda */
+        margin-top: 10px; /* Adiciona espaço acima */
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .floating-btn {
+        width: 60px; /* Aumentado de 50px */
+        height: 60px; /* Aumentado de 50px */
+        line-height: 60px; /* Ajustado para nova altura */
+        font-size: 30px; /* Aumentado de 24px */
+        bottom: 25px; /* Ajuste opcional de posição */
+        right: 25px;  /* Ajuste opcional de posição */
+    }
+
+    #transactions li {
+        font-size: 0.9rem; /* Ajusta tamanho da fonte em telas menores */
+    }
+
+    .transaction-date {
+        font-size: 0.75rem;
+    }
+
+    .transaction-description {
+        font-size: 0.9rem;
+    }
+
+    .transaction-category {
+        font-size: 0.8rem;
+    }
+
+    .transaction-amount {
+        font-size: 0.9rem;
+    }
+
+    .delete-action {
+        width: 70px; /* Pode ajustar a largura em telas menores */
+    }
+
+    .view {
+        padding-top: 70px; /* Aumenta espaço se necessário */
+    }
+
+    .chart-container {
+        padding: 15px;
+        max-height: 45vh; /* Pode ajustar para telas menores */
+    }
+
+    #notification-container {
+        width: calc(100% - 40px);
+        top: 70px; /* Abaixo do header/menu em telas menores */
+        left: 50%; /* Mantém centralizado */
+        transform: translateX(-50%); /* Mantém centralizado */
+    }
+
+    .notification {
+        font-size: 0.85rem;
+    }
+}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro</title>
+    <!-- Favicon Links -->
+    <link rel="icon" href="images/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="images/icon.png">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/transactions.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/charts.css">
+    <link rel="stylesheet" href="css/responsive.css"> <!-- Responsivo por último -->
+    <link rel="stylesheet" href="css/statement.css"> <!-- Novo CSS para Extrato -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Botão Hamburger -->
+    <button id="menu-toggle" class="menu-toggle">
+        <span class="hamburger"></span>
+    </button>
+
+    <!-- Menu Drawer -->
+    <nav id="drawer" class="drawer">
+        <ul>
+            <li><a href="#" class="nav-link" data-view="transactions-view">Transações</a></li>
+            <li><a href="#" class="nav-link" data-view="charts-view">Gráficos</a></li>
+            <!-- Novo link para Extrato -->
+            <li><a href="#" class="nav-link" data-view="statement-view">Extrato Mensal</a></li>
+        </ul>
+    </nav>
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Container Principal das Telas -->
+    <main id="main-content">
+        <!-- Tela de Transações (Conteúdo existente) -->
+        <div id="transactions-view" class="view active-view">
+            <div class="container">
+                <h1>Controle Financeiro</h1>
+                <!-- Estrutura da seção de informações modificada -->
+                <div id="info-section">
+                    <!-- Input de Salário -->
+                    <div class="info-item salary-input-container">
+                        <label for="salary">Salário:</label>
+                        <input type="number" id="salary" name="salary" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <!-- Display de Informações (Totais e Status) -->
+                    <div class="info-display">
+                        <span id="salaryDisplay">Salário: R$0.00</span>
+                        <!-- Saldo Disponível Caixa -->
+                        <span id="caixaBalanceDisplay">Saldo Caixa: R$0.00</span>
+                        <!-- Saldo Disponível Reserva -->
+                        <span id="reservaBalanceDisplay">Saldo Reserva: R$0.00</span>
+                        <hr/>
+                        <span id="needsTotalDisplay">Necessidades (Mês): R$0.00</span>
+                        <span id="wantsTotalDisplay">Desejos (Mês): R$0.00</span>
+                        <hr/>
+                        <!-- Totais Adicionados -->
+                        <span id="caixaTotalDisplay">Caixa (Total Adic.): R$0.00</span>
+                        <span id="reservaTotalDisplay">Reserva (Total Adic.): R$0.00</span>
+                        <div id="distributionStatus" class="distribution-status">
+                            Distribuição (Nec/Des/Res): N/A
+                        </div>
+                    </div>
+                </div>
+                <!-- Fim da estrutura modificada -->
+
+                <div id="transactionsList">
+                    <h2>Transações</h2>
+                    <ul id="transactions">
+                        <!-- Transações serão adicionadas aqui -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nova Tela de Gráficos -->
+        <div id="charts-view" class="view hidden-view">
+            <div class="container">
+                <h1>Análise de Gastos</h1>
+                <div class="chart-container">
+                    <h2>Regra 50/30/20</h2>
+                    <canvas id="ruleChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h2>Distribuição por Categoria</h2>
+                    <canvas id="categoryPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nova Tela de Extrato -->
+        <div id="statement-view" class="view hidden-view">
+            <div class="container">
+                <h1>Extrato Mensal</h1>
+                <div class="statement-controls">
+                    <label for="monthYearSelect">Selecionar Mês:</label>
+                    <select id="monthYearSelect"></select>
+                </div>
+                <div id="statementList">
+                    <h2>Transações do Mês</h2>
+                    <ul id="statementTransactions">
+                        <!-- Transações do extrato serão adicionadas aqui -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Botão Flutuante e Modal (mantidos fora das views específicas) -->
+    <button id="addTransactionBtn" class="floating-btn">+</button>
+    <div id="transactionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Nova Transação</h3>
+            <form id="transactionForm">
+                <div class="form-group">
+                    <label for="date">Data:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Quantia:</label>
+                    <input type="number" id="amount" name="amount" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Descrição:</label>
+                    <input type="text" id="description" name="description" placeholder="Ex: Almoço, Conta de luz" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Categoria:</label>
+                    <select id="category" name="category" required>
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="needs">Necessidades</option>
+                        <option value="wants">Desejos</option>
+                        <option value="emergency">Reserva de Emergência</option> <!-- Nova Categoria -->
+                        <option value="caixa">Caixa</option> <!-- Renomeada -->
+                    </select>
+                </div>
+                <!-- Novo grupo para escolher fonte do débito (Necessidades) -->
+                <div class="form-group" id="debitSourceGroup" style="display: none;">
+                    <label>Debitar de:</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="debitSource" value="caixa" checked> Caixa
+                        </label>
+                        <label>
+                            <input type="radio" name="debitSource" value="emergency"> Reserva de Emergência
+                        </label>
+                    </div>
+                </div>
+                <!-- Novo grupo para debitar do caixa (Reserva de Emergência) -->
+                <div class="form-group" id="debitCaixaGroup" style="display: none;">
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" name="debitCaixa" value="true" checked> Debitar do Saldo Caixa?
+                        </label>
+                    </div>
+                </div>
+                <button type="submit">Adicionar Transação</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Container para Notificações -->
+    <div id="notification-container"></div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
