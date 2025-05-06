@@ -67,10 +67,29 @@
     display: block;
 }
 
-#salaryDisplay, #totalExpensesDisplay /* totalExpensesDisplay pode ser removido se não existir mais */ {
-    font-weight: 600;
+/* Cor padrão e peso normal para Salário, Caixa Adic., Reserva Adic. */
+#salaryDisplay,
+#caixaTotalDisplay,
+#reservaTotalDisplay {
+    font-weight: 400; /* Peso normal */
     color: #333;
     font-size: 0.95rem;
+}
+
+/* Cor vermelha e peso normal para os totais de gastos do mês */
+#needsTotalDisplay,
+#wantsTotalDisplay {
+    font-weight: 400; /* Peso normal */
+    color: #c62828;
+    font-size: 0.95rem;
+}
+
+/* Novo: Estilo para os saldos (Caixa e Reserva) - Negrito */
+#caixaBalanceDisplay,
+#reservaBalanceDisplay {
+    font-weight: 600; /* Negrito */
+    font-size: 0.95rem; /* Mantém o tamanho da fonte */
+    /* A cor é definida dinamicamente via JS */
 }
 
 /* --- Estilos das Telas (Views) --- */

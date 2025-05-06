@@ -114,10 +114,28 @@ export function updateCategoryTotalsDisplay() {
     const caixaTotalGeneral = calculateCategoryExpenses('caixa');
     const reservaTotalGeneral = calculateCategoryExpenses('emergency');
 
-    document.getElementById('needsTotalDisplay').textContent = `Necessidades (Mês): R$${needsTotalMonth.toFixed(2)}`;
-    document.getElementById('wantsTotalDisplay').textContent = `Desejos (Mês): R$${wantsTotalMonth.toFixed(2)}`;
-    document.getElementById('caixaTotalDisplay').textContent = `Caixa (Total Adic.): R$${caixaTotalGeneral.toFixed(2)}`;
-    document.getElementById('reservaTotalDisplay').textContent = `Reserva (Total Adic.): R$${reservaTotalGeneral.toFixed(2)}`;
+    // Elementos do DOM
+    const needsDisplay = document.getElementById('needsTotalDisplay');
+    const wantsDisplay = document.getElementById('wantsTotalDisplay');
+    const caixaTotalDisplay = document.getElementById('caixaTotalDisplay');
+    const reservaTotalDisplay = document.getElementById('reservaTotalDisplay');
+
+    // Atualiza texto
+    if (needsDisplay) needsDisplay.textContent = `Necessidades (Mês): R$${needsTotalMonth.toFixed(2)}`;
+    if (wantsDisplay) wantsDisplay.textContent = `Desejos (Mês): R$${wantsTotalMonth.toFixed(2)}`;
+    if (caixaTotalDisplay) caixaTotalDisplay.textContent = `Caixa (Total Adic.): R$${caixaTotalGeneral.toFixed(2)}`;
+    if (reservaTotalDisplay) reservaTotalDisplay.textContent = `Reserva (Total Adic.): R$${reservaTotalGeneral.toFixed(2)}`;
+
+    // Atualiza cor dos totais adicionados (Caixa e Reserva)
+    // Verde se >= 0, vermelho se < 0 (embora negativo seja incomum para total adicionado)
+    if (caixaTotalDisplay) {
+        caixaTotalDisplay.style.color = caixaTotalGeneral < 0 ? '#c62828' : '#2e7d32';
+    }
+    if (reservaTotalDisplay) {
+        reservaTotalDisplay.style.color = reservaTotalGeneral < 0 ? '#c62828' : '#2e7d32';
+    }
+
+    // A cor de needsTotalDisplay e wantsTotalDisplay é definida via CSS em layout.css
 }
 
 export function updateCaixaBalanceDisplay() {
@@ -125,7 +143,7 @@ export function updateCaixaBalanceDisplay() {
     const displayElement = document.getElementById('caixaBalanceDisplay');
     if (displayElement) {
         displayElement.textContent = `Saldo Caixa: R$${availableBalance.toFixed(2)}`;
-        displayElement.style.color = availableBalance < 0 ? '#c62828' : '#555';
+        displayElement.style.color = availableBalance < 0 ? '#c62828' : '#2e7d32';
     }
 }
 
@@ -134,7 +152,7 @@ export function updateReservaBalanceDisplay() {
     const displayElement = document.getElementById('reservaBalanceDisplay');
     if (displayElement) {
         displayElement.textContent = `Saldo Reserva: R$${availableBalance.toFixed(2)}`;
-        displayElement.style.color = availableBalance < 0 ? '#c62828' : '#555';
+        displayElement.style.color = availableBalance < 0 ? '#c62828' : '#2e7d32';
     }
 }
 
