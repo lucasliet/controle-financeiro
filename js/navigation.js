@@ -1,4 +1,6 @@
 import { updateCharts } from './charts.js';
+// Importa funções da UI para o extrato
+import { populateMonthYearSelector, updateStatementList } from './ui.js';
 
 const menuToggle = document.getElementById('menu-toggle');
 const drawer = document.getElementById('drawer');
@@ -23,9 +25,24 @@ export function switchView(viewId) {
         view.classList.toggle('active-view', view.id === viewId);
         view.classList.toggle('hidden-view', view.id !== viewId);
     });
+
+    // Ações específicas ao ativar uma view
     if (viewId === 'charts-view') {
-        setTimeout(updateCharts, 50); // Atualiza gráficos ao mostrar a view
+        setTimeout(updateCharts, 50);
+    } else if (viewId === 'statement-view') {
+        // Popula o seletor e mostra o mês atual ao abrir o extrato
+        populateMonthYearSelector();
+        const monthYearSelect = document.getElementById('monthYearSelect');
+        if (monthYearSelect.value) { // Garante que há um valor selecionado
+            updateStatementList(monthYearSelect.value);
+        } else {
+             // Se não houver valor (sem transações?), limpa a lista
+             const statementList = document.getElementById('statementTransactions');
+             if(statementList) statementList.innerHTML = '<li>Nenhuma transação registrada ainda.</li>';
+        }
     }
+    // Nenhuma ação específica extra para 'transactions-view' (já atualizada por updateAllDisplays)
+
     closeDrawer();
 }
 

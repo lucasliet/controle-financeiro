@@ -8,7 +8,8 @@ import {
     updateSalaryDisplay,
     updateCategoryTotalsDisplay,
     updateSavingsBalanceDisplay,
-    updateDistributionStatus
+    updateDistributionStatus,
+    updateStatementList
 } from './js/ui.js';
 import { updateCharts } from './js/charts.js';
 import { initializeNavigation, switchView } from './js/navigation.js';
@@ -19,6 +20,7 @@ const transactionForm = document.getElementById('transactionForm');
 const addTransactionBtn = document.getElementById('addTransactionBtn');
 const modal = document.getElementById('transactionModal');
 const modalCloseBtn = document.getElementsByClassName('close')[0];
+const monthYearSelect = document.getElementById('monthYearSelect'); // Novo elemento
 
 // --- Funções de Handler ---
 function handleSalaryChange(event) {
@@ -72,6 +74,11 @@ function handleAddTransaction(event) {
     closeModal();
 }
 
+// Handler para mudança no select de mês/ano do extrato
+function handleMonthYearChange(event) {
+    updateStatementList(event.target.value);
+}
+
 function openModal() {
     document.getElementById('date').value = getTodayDateString();
     modal.style.display = 'flex';
@@ -94,6 +101,7 @@ function initializeApp() {
     transactionForm.addEventListener('submit', handleAddTransaction);
     addTransactionBtn.addEventListener('click', openModal);
     modalCloseBtn.addEventListener('click', closeModal);
+    monthYearSelect.addEventListener('change', handleMonthYearChange); // Novo listener
 
     // Fechar modal clicando fora
     window.onclick = function(event) {

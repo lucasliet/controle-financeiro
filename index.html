@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/navigation.css">
     <link rel="stylesheet" href="css/charts.css">
     <link rel="stylesheet" href="css/responsive.css"> <!-- Responsivo por último -->
+    <link rel="stylesheet" href="css/statement.css"> <!-- Novo CSS para Extrato -->
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,6 +30,8 @@
         <ul>
             <li><a href="#" class="nav-link" data-view="transactions-view">Transações</a></li>
             <li><a href="#" class="nav-link" data-view="charts-view">Gráficos</a></li>
+            <!-- Novo link para Extrato -->
+            <li><a href="#" class="nav-link" data-view="statement-view">Extrato Mensal</a></li>
         </ul>
     </nav>
     <div id="overlay" class="overlay"></div>
@@ -81,6 +84,23 @@
                 <div class="chart-container">
                     <h2>Distribuição por Categoria</h2>
                     <canvas id="categoryPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nova Tela de Extrato -->
+        <div id="statement-view" class="view hidden-view">
+            <div class="container">
+                <h1>Extrato Mensal</h1>
+                <div class="statement-controls">
+                    <label for="monthYearSelect">Selecionar Mês:</label>
+                    <select id="monthYearSelect"></select>
+                </div>
+                <div id="statementList">
+                    <h2>Transações do Mês</h2>
+                    <ul id="statementTransactions">
+                        <!-- Transações do extrato serão adicionadas aqui -->
+                    </ul>
                 </div>
             </div>
         </div>

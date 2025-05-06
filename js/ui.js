@@ -1,5 +1,10 @@
-import { getExpenses, getSalary, deleteExpense as dataDeleteExpense } from './data.js'; // Renomeia deleteExpense para evitar conflito
-import { calculateCategoryExpenses, calculateAvailableBalance, checkExpensesAgainstRule } from './calculations.js';
+import { getExpenses, getSalary, deleteExpense as dataDeleteExpense } from './data.js';
+import {
+    calculateCategoryExpenses,
+    calculateAvailableBalance,
+    checkExpensesAgainstRule,
+    getExpensesForMonth
+} from './calculations.js';
 
 // --- Funções de Formatação ---
 export function formatDate(dateString) {
@@ -19,11 +24,80 @@ export function getTodayDateString() {
     return `${year}-${month}-${day}`;
 }
 
+// --- Funções da Tela de Extrato ---
+
+export function populateMonthYearSelector() {
+    const select = document.getElementById('monthYearSelect');
+    if (!select) return;
+    select.innerHTML = '';
+
+    const expenses = getExpenses();
+    const availableMonths = new Set();
+
+    expenses.forEach(exp => {
+        const date = new Date(exp.date + 'T00:00:00');
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        availableMonths.add(`${year}-${String(month).padStart(2, '0')}`);
+    });
+
+    const sortedMonths = Array.from(availableMonths).sort().reverse();
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+    sortedMonths.forEach(monthYear => {
+        const [year, monthIndex] = monthYear.split('-');
+        const option = document.createElement('option');
+        option.value = monthYear;
+        option.textContent = `${monthNames[parseInt(monthIndex, 10)]} ${year}`;
+        select.appendChild(option);
+    });
+
+    const today = new Date();
+    const currentMonthYear = `${today.getFullYear()}-${String(today.getMonth()).padStart(2, '0')}`;
+    if (availableMonths.has(currentMonthYear)) {
+        select.value = currentMonthYear;
+    }
+}
+
+export function updateStatementList(selectedMonthYear) {
+    const statementList = document.getElementById('statementTransactions');
+    if (!statementList || !selectedMonthYear) return;
+    statementList.innerHTML = '';
+
+    const [year, monthIndex] = selectedMonthYear.split('-').map(Number);
+    const monthExpenses = getExpensesForMonth(year, monthIndex);
+
+    if (monthExpenses.length === 0) {
+        statementList.innerHTML = '<li>Nenhuma transação encontrada para este mês.</li>';
+        return;
+    }
+
+    const categoryMap = { needs: 'Necessidades', wants: 'Desejos', savings: 'Poupança' };
+
+    monthExpenses.forEach(expense => {
+        const listItem = document.createElement('li');
+        listItem.setAttribute('data-category', expense.category);
+        const categoryName = categoryMap[expense.category] || expense.category;
+        const formattedDate = formatDate(expense.date);
+
+        listItem.innerHTML = `
+            <span class="transaction-info">
+                <span class="transaction-date">${formattedDate}</span>
+                <span class="transaction-details">
+                    <span class="transaction-description">${expense.description}</span>
+                    <span class="transaction-category">(${categoryName})</span>
+                </span>
+            </span>
+            <span class="transaction-amount">R$${expense.amount.toFixed(2)}</span>
+        `;
+        statementList.appendChild(listItem);
+    });
+}
+
 // --- Atualizações do DOM ---
 export function updateSalaryDisplay() {
     const salary = getSalary();
     document.getElementById('salaryDisplay').textContent = `Salário: R$${salary.toFixed(2)}`;
-    // Atualiza também o valor do input se ele existir
     const salaryInput = document.getElementById('salary');
     if (salaryInput) {
         salaryInput.value = salary > 0 ? salary.toFixed(2) : '';
@@ -31,13 +105,16 @@ export function updateSalaryDisplay() {
 }
 
 export function updateCategoryTotalsDisplay() {
-    const needsTotal = calculateCategoryExpenses('needs');
-    const wantsTotal = calculateCategoryExpenses('wants');
-    const savingsTotal = calculateCategoryExpenses('savings'); // Total adicionado como poupança
+    const today = new Date();
+    const currentMonthExpenses = getExpensesForMonth(today.getFullYear(), today.getMonth());
 
-    document.getElementById('needsTotalDisplay').textContent = `Necessidades: R$${needsTotal.toFixed(2)}`;
-    document.getElementById('wantsTotalDisplay').textContent = `Desejos: R$${wantsTotal.toFixed(2)}`;
-    document.getElementById('savingsTotalDisplay').textContent = `Poupança (Total): R$${savingsTotal.toFixed(2)}`;
+    const needsTotalMonth = calculateCategoryExpenses('needs', currentMonthExpenses);
+    const wantsTotalMonth = calculateCategoryExpenses('wants', currentMonthExpenses);
+    const savingsTotalGeneral = calculateCategoryExpenses('savings');
+
+    document.getElementById('needsTotalDisplay').textContent = `Necessidades (Mês): R$${needsTotalMonth.toFixed(2)}`;
+    document.getElementById('wantsTotalDisplay').textContent = `Desejos (Mês): R$${wantsTotalMonth.toFixed(2)}`;
+    document.getElementById('savingsTotalDisplay').textContent = `Poupança (Total): R$${savingsTotalGeneral.toFixed(2)}`;
 }
 
 export function updateSavingsBalanceDisplay() {
@@ -53,19 +130,22 @@ export function updateDistributionStatus() {
     const statusElement = document.getElementById('distributionStatus');
     if (!statusElement) return;
 
-    const needsTotal = calculateCategoryExpenses('needs');
-    const wantsTotal = calculateCategoryExpenses('wants');
-    const savingsTotal = calculateCategoryExpenses('savings');
-    const totalExpenses = needsTotal + wantsTotal + savingsTotal;
+    const today = new Date();
+    const currentMonthExpenses = getExpensesForMonth(today.getFullYear(), today.getMonth());
+
+    const needsTotalMonth = calculateCategoryExpenses('needs', currentMonthExpenses);
+    const wantsTotalMonth = calculateCategoryExpenses('wants', currentMonthExpenses);
+    const savingsTotalMonth = calculateCategoryExpenses('savings', currentMonthExpenses);
+    const totalExpensesMonth = needsTotalMonth + wantsTotalMonth + savingsTotalMonth;
 
     let needsPerc = 0, wantsPerc = 0, savingsPerc = 0;
 
-    if (totalExpenses > 0) {
-        needsPerc = (needsTotal / totalExpenses) * 100;
-        wantsPerc = (wantsTotal / totalExpenses) * 100;
+    if (totalExpensesMonth > 0) {
+        needsPerc = (needsTotalMonth / totalExpensesMonth) * 100;
+        wantsPerc = (wantsTotalMonth / totalExpensesMonth) * 100;
         savingsPerc = 100 - needsPerc - wantsPerc;
     } else {
-        statusElement.textContent = 'Distribuição: N/A';
+        statusElement.textContent = 'Distribuição (Mês): N/A';
         statusElement.className = 'distribution-status';
         return;
     }
@@ -75,18 +155,25 @@ export function updateDistributionStatus() {
     if (!ruleCheck.needsOk && !ruleCheck.wantsOk) statusClass = 'status-bad';
     else if (!ruleCheck.needsOk || !ruleCheck.wantsOk) statusClass = 'status-warning';
 
-    statusElement.textContent = `Distribuição: ${needsPerc.toFixed(1)}% Nec. / ${wantsPerc.toFixed(1)}% Des. / ${savingsPerc.toFixed(1)}% Pou.`;
+    statusElement.textContent = `Distribuição (Mês): ${needsPerc.toFixed(1)}% Nec. / ${wantsPerc.toFixed(1)}% Des. / ${savingsPerc.toFixed(1)}% Pou.`;
     statusElement.className = `distribution-status ${statusClass}`;
 }
 
 export function updateTransactionsList() {
     const transactionsList = document.getElementById('transactions');
     transactionsList.innerHTML = '';
-    const expenses = getExpenses(); // Pega a lista atualizada
+
+    const today = new Date();
+    const currentMonthExpenses = getExpensesForMonth(today.getFullYear(), today.getMonth());
+
+    if (currentMonthExpenses.length === 0) {
+        transactionsList.innerHTML = '<li>Nenhuma transação neste mês.</li>';
+        return;
+    }
 
     const categoryMap = { needs: 'Necessidades', wants: 'Desejos', savings: 'Poupança' };
 
-    expenses.forEach(expense => {
+    currentMonthExpenses.forEach(expense => {
         const listItem = document.createElement('li');
         listItem.setAttribute('data-id', expense.id);
         const categoryName = categoryMap[expense.category] || expense.category;
@@ -106,13 +193,10 @@ export function updateTransactionsList() {
             </div>`;
         transactionsList.appendChild(listItem);
 
-        // --- Lógica de Swipe (adaptada para usar dataDeleteExpense importado) ---
         let startX = 0, currentX = 0, isDragging = false;
         const threshold = -80;
         const itemWrapper = listItem.querySelector('.transaction-item-wrapper');
 
-        const handleDragStart = (clientX) => { /* ... código handleDragStart ... */ };
-        const handleDragMove = (clientX) => { /* ... código handleDragMove ... */ };
         const handleDragEnd = () => {
             if (!isDragging || listItem.classList.contains('deleting')) return;
             isDragging = false;
@@ -124,15 +208,12 @@ export function updateTransactionsList() {
                 listItem.classList.add('deleting');
                 listItem.addEventListener('animationend', () => {
                     const idToDelete = parseInt(listItem.getAttribute('data-id'), 10);
-                    const deleted = dataDeleteExpense(idToDelete); // Chama a função importada
+                    const deleted = dataDeleteExpense(idToDelete);
                     if (deleted) {
-                        // Atualiza displays relevantes após a exclusão dos dados
                         updateCategoryTotalsDisplay();
                         updateSavingsBalanceDisplay();
                         updateDistributionStatus();
-                        // Idealmente, charts também seriam atualizados, mas isso pode exigir passar a função de update
-                        // ou emitir um evento. Por simplicidade, deixamos assim por enquanto.
-                        listItem.remove(); // Remove do DOM
+                        listItem.remove();
                         showNotification(`Transação "${deleted.description}" removida.`, 'info', 2000);
                     }
                 }, { once: true });
@@ -142,7 +223,6 @@ export function updateTransactionsList() {
             startX = 0; currentX = 0;
         };
 
-        // Reatribuir funções internas para que tenham acesso a startX, currentX, etc.
         const boundHandleDragStart = (clientX) => {
             if (listItem.classList.contains('deleting')) return;
             startX = clientX; isDragging = true; listItem.classList.add('swiping'); itemWrapper.style.transition = 'none';
@@ -154,21 +234,14 @@ export function updateTransactionsList() {
             itemWrapper.style.transform = `translateX(${diffX}px)`;
         };
 
-        // Event Listeners
         listItem.addEventListener('touchstart', (e) => boundHandleDragStart(e.touches[0].clientX), { passive: true });
         listItem.addEventListener('touchmove', (e) => boundHandleDragMove(e.touches[0].clientX), { passive: true });
         listItem.addEventListener('touchend', handleDragEnd);
         listItem.addEventListener('touchcancel', handleDragEnd);
         listItem.addEventListener('mousedown', (e) => boundHandleDragStart(e.clientX));
-        // Listeners de mousemove/mouseup precisam ser globais (adicionados em app.js ou aqui com cuidado para remover)
-        // Por simplicidade, vamos manter a lógica original que adicionava ao document,
-        // mas isso pode vazar listeners se não gerenciado corretamente.
-        // Uma abordagem mais robusta usaria um estado global ou passaria os listeners.
-        // Mantendo como estava por enquanto:
-         document.addEventListener('mousemove', (e) => { if (isDragging) boundHandleDragMove(e.clientX); });
-         document.addEventListener('mouseup', () => { if (isDragging) handleDragEnd(); });
-         listItem.addEventListener('mouseleave', () => { if (isDragging && !document.mouseButtons) handleDragEnd(); });
-        // --- Fim Lógica de Swipe ---
+        document.addEventListener('mousemove', (e) => { if (isDragging) boundHandleDragMove(e.clientX); });
+        document.addEventListener('mouseup', () => { if (isDragging) handleDragEnd(); });
+        listItem.addEventListener('mouseleave', () => { if (isDragging && !document.mouseButtons) handleDragEnd(); });
     });
 }
 
@@ -179,7 +252,6 @@ export function clearTransactionForm() {
     document.getElementById('date').value = '';
 }
 
-// --- Função de Notificação ---
 export function showNotification(message, type = 'info', duration = 3000) {
     const container = document.getElementById('notification-container');
     if (!container) return;
@@ -202,7 +274,7 @@ export function showNotification(message, type = 'info', duration = 3000) {
 
     closeButton.onclick = removeNotification;
     container.appendChild(notification);
-    void notification.offsetWidth; // Force reflow
+    void notification.offsetWidth;
     notification.classList.add('show');
 
     if (duration > 0) {
@@ -210,11 +282,10 @@ export function showNotification(message, type = 'info', duration = 3000) {
     }
 }
 
-// Função para atualizar toda a UI principal de uma vez
 export function updateAllDisplays() {
     updateSalaryDisplay();
     updateCategoryTotalsDisplay();
     updateSavingsBalanceDisplay();
     updateDistributionStatus();
-    updateTransactionsList(); // Recria a lista e anexa listeners
+    updateTransactionsList();
 }
