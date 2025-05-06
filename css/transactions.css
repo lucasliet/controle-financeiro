@@ -1,0 +1,112 @@
+#transactions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#transactions li {
+    position: relative;
+    background-color: #f9f9f9;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.transaction-item-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+    border-left: 4px solid #6a1b9a;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+    touch-action: pan-y;
+}
+
+.transaction-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-right: 10px;
+    gap: 2px;
+}
+
+.transaction-date {
+    font-size: 0.8rem;
+    color: #888;
+    font-weight: 300;
+}
+
+.transaction-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.transaction-description {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.transaction-category {
+    font-size: 0.85rem;
+    color: #777;
+}
+
+.transaction-amount {
+    font-weight: 600;
+    color: #6a1b9a;
+    white-space: nowrap;
+    font-size: 0.95rem;
+}
+
+/* Ação de Exclusão (Swipe) */
+.delete-action {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 80px;
+    background-color: #e53935;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.delete-action svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+#transactions li.swiping .transaction-item-wrapper {
+    transition: none;
+}
+
+#transactions li.swiping .delete-action {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Animação de Saída */
+@keyframes fadeOut {
+    to {
+        opacity: 0; height: 0; margin-bottom: 0;
+        padding-top: 0; padding-bottom: 0; border: 0;
+    }
+}
+
+#transactions li.deleting {
+    animation: fadeOut 0.4s ease-out forwards;
+}
