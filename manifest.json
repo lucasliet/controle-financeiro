@@ -2,7 +2,7 @@
   "name": "Controle Financeiro Pessoal",
   "short_name": "Finanças",
   "description": "App simples para controle de despesas pessoais baseado na regra 50/30/20.",
-  "start_url": "/",
+  "start_url": "/controle-financeiro/",
   "display": "standalone",
   "background_color": "#f4f7f6",
   "theme_color": "#6a1b9a",
