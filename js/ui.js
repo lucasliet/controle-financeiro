@@ -309,10 +309,16 @@ export function showNotification(message, type = 'info', duration = 3000) {
     }
 }
 
+// Mostra/Esconde radio buttons (needs) ou checkbox (emergency)
 export function toggleDebitSourceDisplay(category) {
-    const group = document.getElementById('debitSourceGroup');
-    if (group) {
-        group.style.display = (category === 'needs') ? 'block' : 'none';
+    const needsGroup = document.getElementById('debitSourceGroup');
+    const emergencyGroup = document.getElementById('debitCaixaGroup'); // Checkbox group
+
+    if (needsGroup) {
+        needsGroup.style.display = (category === 'needs') ? 'block' : 'none';
+    }
+    if (emergencyGroup) {
+        emergencyGroup.style.display = (category === 'emergency') ? 'block' : 'none';
     }
 }
 

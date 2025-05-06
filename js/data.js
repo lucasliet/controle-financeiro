@@ -43,8 +43,9 @@ export function setSalary(newSalary) {
     saveData();
 }
 
-// Modificado para aceitar e armazenar debitedFrom
-export function addExpense(amount, category, description, date, debitedFrom = null) {
+// Modificado para aceitar debitedFrom (needs) e debitFromCaixa (emergency)
+export function addExpense(amount, category, description, date, options = {}) {
+    const { debitedFrom, debitFromCaixa } = options;
     const newExpense = {
         id: nextExpenseId++,
         amount,
@@ -55,6 +56,10 @@ export function addExpense(amount, category, description, date, debitedFrom = nu
     // Armazena a fonte do débito APENAS para necessidades
     if (category === 'needs' && debitedFrom) {
         newExpense.debitedFrom = debitedFrom; // 'caixa' ou 'emergency'
+    }
+    // Armazena se deve debitar do caixa para reserva
+    if (category === 'emergency' && debitFromCaixa === true) {
+        newExpense.debitFromCaixa = true;
     }
     expenses.push(newExpense);
     expenses.sort((a, b) => new Date(b.date) - new Date(a.date));

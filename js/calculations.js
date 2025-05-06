@@ -43,26 +43,25 @@ export function checkExpensesAgainstRule(income) {
     };
 }
 
-// Saldo disponível Caixa = Total Adicionado Caixa - Total Desejos - Total Necessidades (debitadas do Caixa)
+// Saldo disponível Caixa = Total Adicionado Caixa - Total Desejos - Total Necessidades (debitadas do Caixa) - Total Reserva (debitadas do Caixa)
 export function calculateAvailableCaixaBalance() {
     const totalCaixa = calculateCategoryExpenses('caixa');
     const totalWants = calculateCategoryExpenses('wants');
     let totalNeedsDebitedFromCaixa = 0;
+    let totalEmergencyDebitedFromCaixa = 0;
 
     getExpenses().forEach(exp => {
         // Soma necessidades que foram explicitamente debitadas do caixa
         if (exp.category === 'needs' && exp.debitedFrom === 'caixa') {
             totalNeedsDebitedFromCaixa += exp.amount;
         }
-        // Considera também necessidades antigas (sem debitedFrom) como debitadas do caixa?
-        // Ou assume que só as novas com a propriedade definida contam?
-        // Vamos assumir que só as novas contam por enquanto.
-        // else if (exp.category === 'needs' && !exp.debitedFrom) {
-        //     totalNeedsDebitedFromCaixa += exp.amount; // Opcional: tratar dados antigos
-        // }
+        // Subtrai do saldo caixa se a transação de reserva foi marcada para debitar
+        if (exp.category === 'emergency' && exp.debitFromCaixa === true) {
+            totalEmergencyDebitedFromCaixa += exp.amount;
+        }
     });
 
-    return totalCaixa - totalWants - totalNeedsDebitedFromCaixa;
+    return totalCaixa - totalWants - totalNeedsDebitedFromCaixa - totalEmergencyDebitedFromCaixa;
 }
 
 // Saldo disponível Reserva = Total Adicionado Reserva - Total Necessidades (debitadas da Reserva)
