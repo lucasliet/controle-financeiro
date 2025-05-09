@@ -11,6 +11,7 @@ const views = document.querySelectorAll('.view');
 let touchStartX = 0;
 let touchCurrentX = 0;
 let isDraggingDrawer = false;
+let drawerIsOpenAtDragStart = false; // Tracks if the drawer was open at the start of a swipe gesture
 const edgeThreshold = 50; // Quão perto da borda o toque deve começar
 const openThreshold = 80; // Quão longe deslizar para abrir
 
@@ -78,15 +79,24 @@ export function switchView(viewId) {
 
 // --- Handlers de Swipe ---
 function handleTouchStart(event) {
-    if (drawer.classList.contains('open')) return; // Não iniciar swipe se já estiver aberto
     touchStartX = event.touches[0].clientX;
-    if (touchStartX <= edgeThreshold) {
+    touchCurrentX = touchStartX; // Initialize currentX
+    drawerIsOpenAtDragStart = drawer.classList.contains('open');
+
+    if (drawerIsOpenAtDragStart) {
+        // Drawer is open, potential swipe to close. Allow swipe from anywhere relevant.
         isDraggingDrawer = true;
-        // Remove transições durante o arraste
         drawer.style.transition = 'none';
         overlay.style.transition = 'none';
     } else {
-        isDraggingDrawer = false;
+        // Drawer is closed, potential swipe to open from edge.
+        if (touchStartX <= edgeThreshold) {
+            isDraggingDrawer = true;
+            drawer.style.transition = 'none';
+            overlay.style.transition = 'none';
+        } else {
+            isDraggingDrawer = false;
+        }
     }
 }
 
@@ -95,37 +105,57 @@ function handleTouchMove(event) {
 
     touchCurrentX = event.touches[0].clientX;
     let diffX = touchCurrentX - touchStartX;
-
     const drawerWidth = drawer.offsetWidth;
-    // Limita o arraste
-    if (diffX < 0) diffX = 0;
-    if (diffX > drawerWidth) diffX = drawerWidth;
 
-    // Aplica a transformação diretamente
-    drawer.style.transform = `translateX(${-drawerWidth + diffX}px)`;
+    if (drawerIsOpenAtDragStart) { // Swiping to close (drawer was initially open)
+        // diffX will be negative for a left swipe.
+        // Drawer starts at translateX(0). Target X should be between -drawerWidth and 0.
+        let targetX = Math.max(-drawerWidth, Math.min(0, diffX));
+        drawer.style.transform = `translateX(${targetX}px)`;
+        // Opacity from 0.5 (fully open) to 0 (fully closed by swipe)
+        overlay.style.opacity = Math.max(0, 0.5 * (1 + targetX / drawerWidth));
+    } else { // Swiping to open (drawer was initially closed)
+        // diffX will be positive for a right swipe.
+        // Drawer starts at -drawerWidth. Effective movement (targetX_movement) should be between 0 and drawerWidth.
+        let effectiveMove = Math.max(0, Math.min(drawerWidth, diffX));
+        drawer.style.transform = `translateX(${-drawerWidth + effectiveMove}px)`;
+        overlay.classList.add('active'); // Ensure overlay is active
+        // Opacity from 0 (fully closed) to 0.5 (fully open by swipe)
+        overlay.style.opacity = Math.min(0.5, 0.5 * (effectiveMove / drawerWidth));
+    }
 
-    // Mostra o overlay proporcionalmente
-    overlay.classList.add('active'); // Torna visível (sem transição)
-    overlay.style.opacity = (diffX / drawerWidth) * 0.5; // Ajusta opacidade
+    // Prevent default scroll behavior if we are actively dragging the drawer horizontally
+    if (event.cancelable) {
+        event.preventDefault();
+    }
 }
 
 // Refatorado para chamar open/closeDrawer
 function handleTouchEnd(event) {
     if (!isDraggingDrawer) return;
-    isDraggingDrawer = false;
 
+    // touchCurrentX has been updated by the last touchmove or set by touchstart
     const diffX = touchCurrentX - touchStartX;
+    // drawerIsOpenAtDragStart holds the state at the beginning of the drag
 
-    // Decide se abre ou fecha baseado no threshold
-    if (diffX > openThreshold) {
-        openDrawer(); // Chama a função que lida com transições e classes
-    } else {
-        closeDrawer(); // Chama a função que lida com transições e classes
+    isDraggingDrawer = false; // Reset dragging state
+
+    if (drawerIsOpenAtDragStart) { // Was trying to close (drawer was open at touchstart)
+        if (diffX < -openThreshold) { // Swiped left enough
+            closeDrawer();
+        } else { // Not swiped enough, or swiped right
+            openDrawer(); // Snap back to fully open
+        }
+    } else { // Was trying to open (drawer was closed at touchstart)
+        if (diffX > openThreshold) {
+            openDrawer();
+        } else {
+            // Not swiped enough, or swiped left
+            closeDrawer(); // Snap back to fully closed (ensures styles are reset)
+        }
     }
-
-    // Limpa variáveis
-    touchStartX = 0;
-    touchCurrentX = 0;
+    // touchStartX and touchCurrentX will be reset by the next touchstart.
+    // openDrawer/closeDrawer handle resetting transitions and styles.
 }
 
 export function initializeNavigation() {
