@@ -7,7 +7,6 @@ import {
     getExpensesForMonth
 } from './calculations.js';
 
-// --- Funções de Formatação ---
 export function formatDate(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString + 'T00:00:00');
@@ -25,7 +24,6 @@ export function getTodayDateString() {
     return `${year}-${month}-${day}`;
 }
 
-// --- Funções da Tela de Extrato ---
 
 export function populateMonthYearSelector() {
     const select = document.getElementById('monthYearSelect');
@@ -95,7 +93,6 @@ export function updateStatementList(selectedMonthYear) {
     });
 }
 
-// --- Atualizações do DOM ---
 export function updateSalaryDisplay() {
     const salary = getSalary();
     document.getElementById('salaryDisplay').textContent = `Salário: R$${salary.toFixed(2)}`;
@@ -114,19 +111,16 @@ export function updateCategoryTotalsDisplay() {
     const caixaTotalGeneral = calculateCategoryExpenses('caixa');
     const reservaTotalGeneral = calculateCategoryExpenses('emergency');
 
-    // Elementos do DOM
     const needsDisplay = document.getElementById('needsTotalDisplay');
     const wantsDisplay = document.getElementById('wantsTotalDisplay');
     const caixaTotalDisplay = document.getElementById('caixaTotalDisplay');
     const reservaTotalDisplay = document.getElementById('reservaTotalDisplay');
 
-    // Atualiza texto
     if (needsDisplay) needsDisplay.textContent = `Necessidades (Mês): R$${needsTotalMonth.toFixed(2)}`;
     if (wantsDisplay) wantsDisplay.textContent = `Desejos (Mês): R$${wantsTotalMonth.toFixed(2)}`;
     if (caixaTotalDisplay) caixaTotalDisplay.textContent = `Caixa (Total Adic.): R$${caixaTotalGeneral.toFixed(2)}`;
     if (reservaTotalDisplay) reservaTotalDisplay.textContent = `Reserva (Total Adic.): R$${reservaTotalGeneral.toFixed(2)}`;
 
-    // Atualiza cor dos totais adicionados (Caixa e Reserva)
     if (caixaTotalDisplay) {
         caixaTotalDisplay.style.color = caixaTotalGeneral === 0 ? '#333' : (caixaTotalGeneral < 0 ? '#c62828' : '#2e7d32');
     }
@@ -134,7 +128,6 @@ export function updateCategoryTotalsDisplay() {
         reservaTotalDisplay.style.color = reservaTotalGeneral === 0 ? '#333' : (reservaTotalGeneral < 0 ? '#c62828' : '#2e7d32');
     }
 
-    // Atualiza cor dos totais de gastos (Necessidades e Desejos)
     if (needsDisplay) {
         needsDisplay.style.color = needsTotalMonth === 0 ? '#333' : '#c62828';
     }
@@ -314,10 +307,9 @@ export function showNotification(message, type = 'info', duration = 3000) {
     }
 }
 
-// Mostra/Esconde radio buttons (needs) ou checkbox (emergency)
 export function toggleDebitSourceDisplay(category) {
     const needsGroup = document.getElementById('debitSourceGroup');
-    const emergencyGroup = document.getElementById('debitCaixaGroup'); // Checkbox group
+    const emergencyGroup = document.getElementById('debitCaixaGroup'); 
 
     if (needsGroup) {
         needsGroup.style.display = (category === 'needs') ? 'block' : 'none';
