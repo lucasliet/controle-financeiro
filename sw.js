@@ -1,12 +1,20 @@
 const CACHE_NAME = 'financial-control-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/images/icon-192x192.png', // Adicione o caminho real dos seus ícones
-  '/images/icon-512x512.png'  // Adicione o caminho real dos seus ícones
-  // Adicione outros assets estáticos que você queira cachear
+  './', // Represents the root of the PWA, typically index.html
+  './index.html',
+  './manifest.json',
+  './css/base.css',
+  './css/layout.css',
+  './css/components.css',
+  './css/transactions.css',
+  './css/modal.css',
+  './css/navigation.css',
+  './css/charts.css',
+  './css/responsive.css',
+  './css/statement.css',
+  './app.js',
+  './images/icon.png' // As specified in manifest.json
+  // Note: CDN links (fonts, chart.js) are not typically cached here unless specifically handled.
 ];
 
 // Evento de Instalação: Cacheia os assets principais
