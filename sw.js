@@ -1,4 +1,4 @@
-const CACHE_NAME = 'financial-control-cache-v1';
+const CACHE_NAME = 'financial-control-cache-v2';
 const urlsToCache = [
   './', 
   './index.html',
@@ -28,14 +28,21 @@ self.addEventListener('install', event => {
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.match(event.request).then(cachedResponse => {
+        const fetchPromise = fetch(event.request).then(networkResponse => {
+          if (event.request.url.startsWith(self.location.origin) && networkResponse.ok) {
+            cache.put(event.request, networkResponse.clone());
+          }
+          return networkResponse;
+        }).catch(error => {
+          console.error('Fetch failed; returning cached response if available.', error);
+          throw error; 
+        });
+
+        return cachedResponse || fetchPromise;
+      });
+    })
   );
 });
 
