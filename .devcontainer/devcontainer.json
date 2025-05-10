@@ -1,5 +1,10 @@
 {
   "name": "app_wand",
-  "image": "mcr.microsoft.com/vscode/devcontainers/javascript-node:0-14",
-  "postCreateCommand": "echo \"y\" | npx serve ."
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "features": {
+    "ghcr.io/devcontainers/features/node:latest": {
+      "version": "latest"
+    },
+    "ghcr.io/lucasliet/features/aider-installer:latest": {}
+  }
 }
